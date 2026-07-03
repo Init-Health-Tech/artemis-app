@@ -10,6 +10,11 @@ class TestIndexView(TestCaseUtils):
         response = self.auth_client.get(self.reverse(self.view_name))
         self.assertResponse200(response)
 
+    def test_spa_routes_serve_index_on_refresh(self):
+        for path in ("/rfid", "/animales", "/lotes", "/inventario", "/estados", "/login"):
+            response = self.auth_client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+
 
 class TestAdminEnvironmentNotice(TestCaseUtils):
     view_name = "admin:index"

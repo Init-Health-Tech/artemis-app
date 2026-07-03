@@ -32,6 +32,9 @@ npm-debug.log
 .sass-cache
 *.map
 
+# Design references (local only, not versioned)
+stitch_agrotrace_enterprise_saas/
+
 # General
 /artemis-venv/
 /venv/

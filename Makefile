@@ -16,7 +16,6 @@ backend_format:
 
 # Commands for Docker version
 docker_setup:
-	docker volume create {{project_name}}_dbdata
 	docker compose build --no-cache backend frontend
 	docker compose run --rm backend python manage.py spectacular --color --file schema.yml
 	docker compose run --rm frontend pnpm run openapi-ts

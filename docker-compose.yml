@@ -2,9 +2,9 @@ services:
   db:
     image: "postgres:alpine"
     environment:
-      - POSTGRES_USER={{project_name}}
+      - POSTGRES_USER=artemis
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB={{project_name}}
+      - POSTGRES_DB=artemis
     ports:
       - "5432"
     volumes:
@@ -47,7 +47,7 @@ services:
     build:
       dockerfile: backend/Dockerfile
       context: .
-    command: celery --app={{project_name}} worker --loglevel=info
+    command: celery --app=artemis worker --loglevel=info
     volumes:
       - ./:/home/user/app/
     env_file: backend/.env
@@ -64,5 +64,3 @@ services:
 
 volumes:
   dbdata:
-    name: {{project_name}}_dbdata
-    external: true

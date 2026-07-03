@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgriCore Pro | Field Scan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .pulse-animation {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(147, 214, 149, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(147, 214, 149, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(147, 214, 149, 0); }
+    }
+    .scan-line {
+      animation: scan-move 3s ease-in-out infinite;
+    }
+    @keyframes scan-move {
+      0%, 100% { top: 0%; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #1a1c1c; }
+    ::-webkit-scrollbar-thumb { background: #41493f; border-radius: 10px; }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-error-container": "#ffdad6",
+            "secondary": "#8bd88e",
+            "primary-container": "#6aab6e",
+            "tertiary-container": "#d18f27",
+            "on-secondary-container": "#81cd84",
+            "on-secondary-fixed": "#002106",
+            "on-primary-container": "#003d13",
+            "on-primary": "#003911",
+            "surface-container-high": "#282a2a",
+            "surface-container": "#1e2020",
+            "surface-container-lowest": "#0d0f0f",
+            "on-background": "#e2e2e2",
+            "primary-fixed": "#aef3af",
+            "surface-bright": "#383939",
+            "on-tertiary-container": "#4a2e00",
+            "background": "#121414",
+            "on-primary-fixed": "#002107",
+            "surface-dim": "#121414",
+            "on-tertiary-fixed-variant": "#633f00",
+            "on-error": "#690005",
+            "tertiary": "#ffb954",
+            "inverse-on-surface": "#2f3131",
+            "inverse-surface": "#e2e2e2",
+            "tertiary-fixed": "#ffddb4",
+            "surface-container-highest": "#333535",
+            "on-surface-variant": "#c0c9bc",
+            "on-secondary-fixed-variant": "#00531b",
+            "primary": "#93d695",
+            "on-primary-fixed-variant": "#0e5220",
+            "outline-variant": "#41493f",
+            "inverse-primary": "#2b6b35",
+            "secondary-fixed-dim": "#8bd88e",
+            "surface-tint": "#93d695",
+            "error": "#ffb4ab",
+            "error-container": "#93000a",
+            "on-surface": "#e2e2e2",
+            "tertiary-fixed-dim": "#ffb954",
+            "secondary-fixed": "#a6f5a8",
+            "on-secondary": "#003910",
+            "surface": "#121414",
+            "on-tertiary-fixed": "#291800",
+            "surface-variant": "#333535",
+            "outline": "#8a9387",
+            "surface-container-low": "#1a1c1c",
+            "secondary-container": "#02581d",
+            "primary-fixed-dim": "#93d695",
+            "on-tertiary": "#452b00"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "sidebar-width": "260px",
+            "header-height": "64px",
+            "unit": "4px",
+            "margin-lg": "24px",
+            "gutter-md": "16px"
+          },
+          "fontFamily": {
+            "mono-data": ["monospace"],
+            "display-lg": ["Inter"],
+            "label-lg": ["Inter"],
+            "title-md": ["Inter"],
+            "label-md": ["Inter"],
+            "title-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "headline-lg": ["Inter"],
+            "headline-md": ["Inter"]
+          },
+          "fontSize": {
+            "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "label-lg": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+            "title-md": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+            "label-md": ["11px", {"lineHeight": "16px", "fontWeight": "500"}],
+            "title-lg": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- Side Navigation (Collapsed State as requested for scanning) -->
+<aside class="fixed left-0 top-0 h-screen w-[80px] z-50 flex flex-col bg-surface-container border-r border-outline-variant transition-all duration-300">
+<div class="h-header-height flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[32px]">agriculture</span>
+</div>
+<nav class="flex-1 flex flex-col items-center py-4 space-y-4">
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-bright transition-colors" title="Dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-bright transition-colors" title="Animals">
+<span class="material-symbols-outlined">pets</span>
+</button>
+<!-- Active Tab -->
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary border-l-4 border-primary" title="Field Scan">
+<span class="material-symbols-outlined">sensors</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-bright transition-colors" title="Analytics">
+<span class="material-symbols-outlined">analytics</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-bright transition-colors" title="Traceability">
+<span class="material-symbols-outlined">rebase_edit</span>
+</button>
+</nav>
+<div class="pb-6 flex flex-col items-center space-y-4">
+<button class="w-12 h-12 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-bright transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="ml-[80px] min-h-screen flex flex-col">
+<!-- Top Bar -->
+<header class="h-header-height flex items-center justify-between px-margin-lg bg-surface border-b border-outline-variant z-40">
+<div class="flex items-center gap-4">
+<h1 class="font-title-lg text-on-surface font-black uppercase tracking-tight">Field Scan</h1>
+<div class="h-6 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-[14px] text-tertiary">cloud_off</span>
+<span class="font-label-lg text-on-surface-variant uppercase tracking-widest">Offline Mode</span>
+</div>
+<div class="text-secondary font-label-md">Syncing... (12 pending)</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-highest rounded text-on-surface border border-outline-variant">
+<span class="material-symbols-outlined text-[18px]">battery_horiz_075</span>
+<span class="font-mono-data text-label-lg">84%</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-[12px]">JD</div>
+</div>
+</header>
+<!-- Scanning Interface Content -->
+<div class="flex-1 grid grid-cols-12 gap-gutter-md p-margin-lg bg-background">
+<!-- Left Column: Scanner & Log (5 Columns) -->
+<section class="col-span-12 lg:col-span-5 flex flex-col gap-gutter-md">
+<!-- Central Scanner Interaction -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-8 flex flex-col items-center justify-center relative overflow-hidden h-[340px]">
+
+<div class="relative z-10 flex flex-col items-center">
+<!-- Pulsing Start Scan Button -->
+<button class="group relative w-48 h-48 rounded-full bg-primary flex flex-col items-center justify-center shadow-lg transition-transform active:scale-95 pulse-animation" id="scanButton">
+<span class="material-symbols-outlined text-on-primary text-[56px] font-bold">sensors</span>
+<span class="text-on-primary font-label-lg mt-2 uppercase tracking-tighter">Start Scan</span>
+<!-- Scanner Light Effect -->
+<div class="absolute inset-0 border-4 border-primary rounded-full opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></div>
+</button>
+<p class="mt-6 font-label-lg text-on-surface-variant text-center max-w-[200px]">Hold industrial handheld near animal RFID tag</p>
+</div>
+<!-- Decorative Scanning Lines -->
+<div class="absolute left-0 right-0 h-1 bg-primary/30 scan-line z-0"></div>
+</div>
+<!-- Real-time Tag Read List -->
+<div class="flex-1 bg-surface-container rounded-xl border border-outline-variant overflow-hidden flex flex-col">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
+<h3 class="font-label-lg text-on-surface-variant uppercase tracking-widest">Recent Detections</h3>
+<span class="font-mono-data text-primary text-[11px]">AUTO-LOG: ON</span>
+</div>
+<div class="flex-1 overflow-y-auto">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface-container-high z-10">
+<tr class="border-b border-outline-variant">
+<th class="px-4 py-2 font-label-md text-on-surface-variant uppercase">RFID Tag ID</th>
+<th class="px-4 py-2 font-label-md text-on-surface-variant uppercase">Time</th>
+<th class="px-4 py-2 font-label-md text-on-surface-variant uppercase text-right">RSSI</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="bg-primary/5">
+<td class="px-4 py-3 font-mono-data text-primary font-bold">#RF-9102</td>
+<td class="px-4 py-3 font-mono-data text-on-surface-variant">14:22:04</td>
+<td class="px-4 py-3 text-right">
+<span class="px-2 py-0.5 bg-secondary-container text-secondary text-[10px] font-bold rounded">-42 dBm</span>
+</td>
+</tr>
+<tr>
+<td class="px-4 py-3 font-mono-data text-on-surface">#RF-8841</td>
+<td class="px-4 py-3 font-mono-data text-on-surface-variant">14:21:58</td>
+<td class="px-4 py-3 text-right">
+<span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded">-58 dBm</span>
+</td>
+</tr>
+<tr>
+<td class="px-4 py-3 font-mono-data text-on-surface">#RF-7230</td>
+<td class="px-4 py-3 font-mono-data text-on-surface-variant">14:19:12</td>
+<td class="px-4 py-3 text-right">
+<span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded">-65 dBm</span>
+</td>
+</tr>
+<tr>
+<td class="px-4 py-3 font-mono-data text-on-surface">#RF-9011</td>
+<td class="px-4 py-3 font-mono-data text-on-surface-variant">14:18:45</td>
+<td class="px-4 py-3 text-right">
+<span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded">-72 dBm</span>
+</td>
+</tr>
+<tr>
+<td class="px-4 py-3 font-mono-data text-on-surface">#RF-3392</td>
+<td class="px-4 py-3 font-mono-data text-on-surface-variant">14:15:20</td>
+<td class="px-4 py-3 text-right">
+<span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded">-81 dBm</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Right Column: Active Record & Quick Actions (7 Columns) -->
+<section class="col-span-12 lg:col-span-7 flex flex-col gap-gutter-md">
+<!-- Active Animal Card -->
+<div class="bg-surface-container rounded-xl border-2 border-primary overflow-hidden shadow-2xl flex flex-col md:flex-row h-full max-h-[440px]">
+<div class="w-full md:w-2/5 relative h-64 md:h-full">
+<img class="w-full h-full object-cover" data-alt="A professional high-contrast photograph of a healthy Black Angus steer in a high-tech agricultural facility. The lighting is dramatic and technical, highlighting the animal's powerful build against a dark, industrial background. The steer faces forward with clear cattle identification tags visible. The overall mood is clinical, authoritative, and sophisticated, matching a premium dark-themed management software." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFpOeavzbrjcOsiHEqwELALqKSsB3YZFpDmFmlS75ddvCKbr-0xBjNV3JPZ51yUYkdv5Ou8dxZQrTsj8IGSD0wnXskYwug90r8sHHEZabWNMu9sYZpPWHWDacOTIxarAQtYP4jHG3EknWrzGtmp4UM-6opaRTmaIV2ZQMihZEVHhm7fkCVOP1B2HobZjGFT-Kv42zRM0TeyL-PLDnHyVS9vgq-WyOZM5O0BUA5K_WcS21yAH7MuBxAYfUCzah1vbJRXWYNae2NdSFj"/>
+<div class="absolute top-4 left-4">
+<span class="px-3 py-1 bg-primary text-on-primary font-bold text-label-lg rounded shadow-lg uppercase">Currently Identified</span>
+</div>
+<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+<div class="text-[32px] font-black text-white leading-tight uppercase">Steer #RF-9102</div>
+<div class="text-primary font-label-lg tracking-[0.2em] uppercase">Sector: North Grazing B</div>
+</div>
+</div>
+<div class="flex-1 p-6 flex flex-col justify-between">
+<div class="grid grid-cols-2 gap-4">
+<div class="p-3 bg-surface-container-high rounded border border-outline-variant">
+<div class="font-label-md text-on-surface-variant uppercase">Breed</div>
+<div class="font-title-lg text-on-surface">Black Angus</div>
+</div>
+<div class="p-3 bg-surface-container-high rounded border border-outline-variant">
+<div class="font-label-md text-on-surface-variant uppercase">Weight (Last)</div>
+<div class="font-title-lg text-on-surface">642.5 kg</div>
+</div>
+<div class="p-3 bg-surface-container-high rounded border border-outline-variant">
+<div class="font-label-md text-on-surface-variant uppercase">Age</div>
+<div class="font-title-lg text-on-surface">24 Months</div>
+</div>
+<div class="p-3 bg-surface-container-high rounded border border-outline-variant">
+<div class="font-label-md text-on-surface-variant uppercase">Health Status</div>
+<div class="flex items-center gap-2 mt-1">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary"></div>
+<div class="font-title-lg text-secondary">Optimal</div>
+</div>
+</div>
+</div>
+<!-- Alert Box -->
+<div class="mt-6 p-4 bg-error-container/20 border border-error/30 rounded-lg flex items-start gap-4">
+<span class="material-symbols-outlined text-error text-[32px]">warning</span>
+<div>
+<div class="font-title-md text-error font-bold uppercase">Last Action Required</div>
+<p class="text-on-error-container text-body-md mt-1">Bovine Viral Diarrhea (BVD) booster overdue by 4 days. Flagged for quarantine hold.</p>
+</div>
+</div>
+<button class="mt-6 w-full py-4 bg-surface-container-highest border border-outline-variant rounded-xl flex items-center justify-center gap-2 hover:bg-surface-bright transition-all group">
+<span class="material-symbols-outlined text-on-surface">visibility</span>
+<span class="font-title-md text-on-surface uppercase font-bold tracking-tight">Open Full Health Record</span>
+</button>
+</div>
+</div>
+<!-- Quick Action Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+<button class="flex flex-col items-center justify-center gap-2 p-6 bg-surface-container border border-outline-variant rounded-xl hover:border-primary hover:bg-primary-container/10 transition-all active:scale-95 group">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-primary/20">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">scale</span>
+</div>
+<span class="font-label-lg text-on-surface uppercase tracking-widest font-bold">Log Weight</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-6 bg-surface-container border border-outline-variant rounded-xl hover:border-primary hover:bg-primary-container/10 transition-all active:scale-95 group">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-primary/20">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">vaccines</span>
+</div>
+<span class="font-label-lg text-on-surface uppercase tracking-widest font-bold">Apply Vaccine</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-6 bg-surface-container border border-outline-variant rounded-xl hover:border-primary hover:bg-primary-container/10 transition-all active:scale-95 group">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-primary/20">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">move_down</span>
+</div>
+<span class="font-label-lg text-on-surface uppercase tracking-widest font-bold">Move Pen</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-6 bg-surface-container border border-outline-variant rounded-xl hover:border-primary hover:bg-primary-container/10 transition-all active:scale-95 group">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-primary/20">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">medical_services</span>
+</div>
+<span class="font-label-lg text-on-surface uppercase tracking-widest font-bold">Log Treatment</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-6 bg-error-container/10 border border-error/20 rounded-xl hover:border-error hover:bg-error-container/20 transition-all active:scale-95 group">
+<div class="w-12 h-12 rounded-full bg-error-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-error">flag</span>
+</div>
+<span class="font-label-lg text-error uppercase tracking-widest font-bold">Flag Incident</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-6 bg-surface-container border border-outline-variant rounded-xl opacity-50 cursor-not-allowed">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">more_horiz</span>
+</div>
+<span class="font-label-lg text-on-surface-variant uppercase tracking-widest font-bold">More</span>
+</button>
+</div>
+</section>
+</div>
+<!-- Utility Footer / Status Bar -->
+<footer class="h-10 bg-surface-container-low border-t border-outline-variant px-margin-lg flex items-center justify-between text-[11px] font-mono-data text-on-surface-variant/60">
+<div class="flex items-center gap-6">
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> READER: CONNECTED</span>
+<span>ANTENNA: DUAL-ARRAY</span>
+<span>LATENCY: 12ms</span>
+</div>
+<div>SESSION ID: 2023-FSCAN-0041-A</div>
+</footer>
+</main>
+<script>
+    // Simple micro-interaction for the scan button
+    const scanBtn = document.getElementById('scanButton');
+    let isScanning = false;
+
+    scanBtn.addEventListener('click', () => {
+      isScanning = !isScanning;
+      if(isScanning) {
+        scanBtn.querySelector('span:first-child').textContent = 'stop_circle';
+        scanBtn.querySelector('span:last-child').textContent = 'Stop Scan';
+        scanBtn.classList.remove('bg-primary');
+        scanBtn.classList.add('bg-error');
+        scanBtn.classList.remove('pulse-animation');
+      } else {
+        scanBtn.querySelector('span:first-child').textContent = 'sensors';
+        scanBtn.querySelector('span:last-child').textContent = 'Start Scan';
+        scanBtn.classList.add('bg-primary');
+        scanBtn.classList.remove('bg-error');
+        scanBtn.classList.add('pulse-animation');
+      }
+    });
+
+    // Handle touch interactions for industrial tablets
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('touchstart', () => {
+        btn.classList.add('opacity-70');
+      });
+      btn.addEventListener('touchend', () => {
+        btn.classList.remove('opacity-70');
+      });
+    });
+  </script>
+</body></html>

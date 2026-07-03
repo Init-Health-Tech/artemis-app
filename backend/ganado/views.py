@@ -1,19 +1,33 @@
 from datetime import timedelta
 
-from django.db.models import F, Q
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db.models import Count, F, Q
 from django.utils import timezone
 from django_filters import rest_framework as filters
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Alimento, Animal, EventoAnimal, LecturaRFID, Lote, MovimientoAlimento
+from .services.cambio_estado import (
+    PREFIJO_CAMBIO_ESTADO,
+    TRANSICIONES_PERMITIDAS,
+    cambiar_estado_animal,
+    cambiar_estado_masivo,
+    transiciones_desde,
+)
+from .services.dashboard import construir_dashboard_extra
 from .services.rfid_lote import aplicar_cambio_lote_por_lectura
+from .services.trazabilidad import construir_trazabilidad
 from .serializers import (
     AlimentoSerializer,
     AnimalDetailSerializer,
     AnimalListSerializer,
+    AnimalWriteSerializer,
+    CambioEstadoMasivoSerializer,
+    CambioEstadoSerializer,
     EventoAnimalSerializer,
     LecturaRFIDScanSerializer,
     LecturaRFIDSerializer,
@@ -45,20 +59,52 @@ class AnimalViewSet(viewsets.ModelViewSet):
     queryset = Animal.objects.select_related("lote").all()
     permission_classes = [IsAuthenticated]
     filterset_class = AnimalFilter
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get_serializer_class(self):
+        if self.action in ("create", "update", "partial_update"):
+            return AnimalWriteSerializer
         if self.action == "retrieve":
             return AnimalDetailSerializer
         return AnimalListSerializer
 
+    def get_serializer_context(self):
+        return {**super().get_serializer_context(), "request": self.request}
+
     def get_queryset(self):
         qs = super().get_queryset()
-        if self.action == "retrieve":
+        if self.action in ("retrieve", "trazabilidad"):
             return qs.prefetch_related(
                 "eventos__usuario_responsable",
                 "lecturas_rfid__ubicacion_lote",
             )
         return qs
+
+    @action(detail=True, methods=["get"], url_path="trazabilidad")
+    def trazabilidad(self, request, pk=None):
+        animal = self.get_object()
+        timeline = construir_trazabilidad(animal)
+        return Response(
+            {
+                "animal": AnimalListSerializer(animal, context={"request": request}).data,
+                "timeline": timeline,
+                "total": len(timeline),
+            }
+        )
+
+    @action(detail=True, methods=["get"], url_path="pesajes")
+    def pesajes(self, request, pk=None):
+        animal = self.get_object()
+        pesajes = (
+            animal.eventos.filter(tipo=EventoAnimal.Tipo.PESAJE, valor_numerico__isnull=False)
+            .order_by("fecha")
+            .values("fecha", "valor_numerico")
+        )
+        data = [
+            {"fecha": p["fecha"].date().isoformat(), "peso": float(p["valor_numerico"])}
+            for p in pesajes
+        ]
+        return Response(data)
 
     @action(detail=True, methods=["post"], url_path="eventos")
     def agregar_evento(self, request, pk=None):
@@ -71,6 +117,79 @@ class AnimalViewSet(viewsets.ModelViewSet):
             serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=["get"], url_path="transiciones-estado")
+    def transiciones_estado(self, request):
+        conteos = {
+            row["estado"]: row["total"]
+            for row in Animal.objects.values("estado").annotate(total=Count("id"))
+        }
+        return Response(
+            {
+                "transiciones": TRANSICIONES_PERMITIDAS,
+                "conteos": conteos,
+                "estados": [
+                    {"value": value, "label": label}
+                    for value, label in Animal.Estado.choices
+                ],
+            }
+        )
+
+    @action(detail=False, methods=["get"], url_path="historial-estados")
+    def historial_estados(self, request):
+        eventos = (
+            EventoAnimal.objects.filter(descripcion__startswith=PREFIJO_CAMBIO_ESTADO)
+            .select_related("animal", "usuario_responsable")
+            .order_by("-fecha")[:25]
+        )
+        return Response(EventoAnimalSerializer(eventos, many=True).data)
+
+    @action(detail=False, methods=["post"], url_path="cambiar-estado-masivo")
+    def cambiar_estado_masivo(self, request):
+        serializer = CambioEstadoMasivoSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        animales = list(Animal.objects.filter(id__in=data["animal_ids"]))
+        if not animales:
+            return Response({"detail": "No se encontraron animales."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            resultado = cambiar_estado_masivo(
+                animales,
+                data["estado"],
+                data["motivo"],
+                request.user,
+                causa_enfermedad=data.get("causa_enfermedad", False),
+                severidad=data.get("severidad", EventoAnimal.Severidad.MODERADA),
+            )
+        except DjangoValidationError as exc:
+            return Response({"detail": exc.messages}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(resultado)
+
+    @action(detail=True, methods=["post"], url_path="cambiar-estado")
+    def cambiar_estado(self, request, pk=None):
+        animal = self.get_object()
+        serializer = CambioEstadoSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        try:
+            resultado = cambiar_estado_animal(
+                animal,
+                data["estado"],
+                data["motivo"],
+                request.user,
+                causa_enfermedad=data.get("causa_enfermedad", False),
+                severidad=data.get("severidad", EventoAnimal.Severidad.MODERADA),
+            )
+        except DjangoValidationError as exc:
+            return Response({"detail": exc.messages}, status=status.HTTP_400_BAD_REQUEST)
+        animal.refresh_from_db()
+        return Response(
+            {
+                **resultado,
+                "transiciones_disponibles": transiciones_desde(animal.estado),
+                "animal": AnimalListSerializer(animal, context={"request": request}).data,
+            }
+        )
+
 
 class LoteViewSet(viewsets.ModelViewSet):
     queryset = Lote.objects.select_related("tipo_alimento_actual").all()
@@ -80,6 +199,9 @@ class LoteViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return LoteDetailSerializer
         return LoteSerializer
+
+    def get_serializer_context(self):
+        return {**super().get_serializer_context(), "request": self.request}
 
 
 class AlimentoViewSet(viewsets.ModelViewSet):
@@ -174,7 +296,7 @@ class LecturaRFIDViewSet(viewsets.ModelViewSet):
             animal = Animal.objects.prefetch_related(
                 "eventos__usuario_responsable", "lecturas_rfid__ubicacion_lote"
             ).get(pk=animal.pk)
-            animal_data = AnimalDetailSerializer(animal).data
+            animal_data = AnimalDetailSerializer(animal, context={"request": request}).data
         else:
             mensaje = "Tag no registrado. Puede crear un animal nuevo con este tag."
             animal_data = None
@@ -216,6 +338,8 @@ class DashboardViewSet(viewsets.ViewSet):
             "animal", "ubicacion_lote"
         ).order_by("-fecha_hora")[:8]
 
+        extra = construir_dashboard_extra(dias_sin_lectura=dias)
+
         data = {
             "animales_activos": animales_activos,
             "animales_sin_lectura": animales_sin_lectura,
@@ -224,5 +348,6 @@ class DashboardViewSet(viewsets.ViewSet):
             "ultimos_eventos": EventoAnimalSerializer(ultimos_eventos, many=True).data,
             "ocupacion_lotes": LoteSerializer(ocupacion_lotes, many=True).data,
             "ultimas_lecturas": LecturaRFIDSerializer(ultimas_lecturas, many=True).data,
+            **extra,
         }
         return Response(data)

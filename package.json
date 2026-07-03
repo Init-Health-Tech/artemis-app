@@ -1,8 +1,8 @@
 {
-  "name": "{{project_name}}-frontend",
+  "name": "artemis-frontend",
   "version": "0.0.1",
   "private": true,
-  "description": "{{project_name}} frontend.",
+  "description": "artemis frontend.",
   "engines": {
     "node": ">=22 <23"
   },
@@ -41,6 +41,7 @@
     "react-dom": "~19.2.0",
     "react-is": "^19.2.0",
     "react-router": "~7.9.4",
+    "recharts": "^2.15.4",
     "scheduler": "^0.27.0",
     "set-cookie-parser": "^2.7.1"
   },

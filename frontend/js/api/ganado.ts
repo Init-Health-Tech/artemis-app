@@ -35,6 +35,8 @@ export interface Animal {
   estado: string;
   estado_display?: string;
   fecha_registro: string;
+  proxima_revision?: string | null;
+  foto_url?: string | null;
   eventos?: EventoAnimal[];
   lecturas_rfid?: LecturaRFID[];
 }
@@ -48,6 +50,8 @@ export interface EventoAnimal {
   fecha: string;
   descripcion: string;
   valor_numerico: string | null;
+  severidad?: string;
+  severidad_display?: string;
   usuario_email?: string;
 }
 
@@ -79,7 +83,9 @@ export interface Lote {
   tipo_alimento_actual_nombre?: string;
   animales_activos_count: number;
   capacidad_usada_pct: number;
+  adg_kg_dia?: number | null;
   animales?: Animal[];
+  peso_promedio_tendencia?: { fecha: string; peso_promedio: number }[];
 }
 
 export interface Alimento {
@@ -93,6 +99,15 @@ export interface Alimento {
   stock_bajo: boolean;
 }
 
+export interface DashboardAlerta {
+  tipo: string;
+  severidad: 'alta' | 'media' | 'baja';
+  titulo: string;
+  descripcion: string;
+  link: string;
+  link_label: string;
+}
+
 export interface DashboardData {
   animales_activos: number;
   animales_sin_lectura: number;
@@ -101,6 +116,67 @@ export interface DashboardData {
   ultimos_eventos: EventoAnimal[];
   ocupacion_lotes?: Lote[];
   ultimas_lecturas?: LecturaRFID[];
+  animales_cuarentena?: number;
+  revisiones_pendientes_count?: number;
+  lotes_sobrepoblados_count?: number;
+  alertas_accionables?: DashboardAlerta[];
+  alertas_activas_count?: number;
+  adg_por_lote?: { lote_id: number; lote_nombre: string; adg_kg_dia: number }[];
+  stock_dias_restantes?: { alimento_id: number; nombre: string; dias_restantes: number; stock_bajo: boolean }[];
+  revisiones_pendientes?: { animal_id: number; numero_interno: string; proxima_revision: string; lote_nombre: string | null }[];
+  resumen_hato?: {
+    total_registrados: number;
+    peso_promedio_kg: number | null;
+    ocupacion_global_pct: number;
+    capacidad_total: number;
+    ocupacion_total: number;
+    lecturas_rfid_hoy: number;
+    eventos_hoy: number;
+  };
+  actividad_semanal?: { fecha: string; label: string; eventos: number; lecturas_rfid: number }[];
+  distribucion_estado?: { estado: string; label: string; total: number }[];
+  eventos_por_tipo?: { tipo: string; label: string; total: number }[];
+  peso_promedio_tendencia?: { fecha: string; peso_promedio: number }[];
+}
+
+export interface CambioEstadoResult {
+  animal_id: number;
+  numero_interno: string;
+  estado_anterior: string;
+  estado_nuevo: string;
+  evento_id: number;
+  animal?: Animal;
+  transiciones_disponibles?: string[];
+}
+
+export interface TransicionesEstadoData {
+  transiciones: Record<string, string[]>;
+  conteos: Record<string, number>;
+  estados: { value: string; label: string }[];
+}
+
+export interface CambioEstadoMasivoResult {
+  exitosos: CambioEstadoResult[];
+  errores: { animal_id: number; numero_interno: string; error: string }[];
+  total_exitosos: number;
+}
+
+export interface PesajePoint {
+  fecha: string;
+  peso: number;
+}
+
+export interface TrazabilidadResponse {
+  animal: Animal;
+  timeline: {
+    tipo_item: string;
+    fecha: string;
+    titulo: string;
+    descripcion: string;
+    icono: string;
+    metadata: Record<string, unknown>;
+  }[];
+  total: number;
 }
 
 export interface RfidScanResult {
@@ -124,9 +200,19 @@ export const ganadoApi = {
   dashboard: () => api.get<DashboardData>('/dashboard/'),
   animales: (params?: Record<string, string>) => api.get<{ results: Animal[] }>('/animales/', { params }),
   animal: (id: number) => api.get<Animal>(`/animales/${id}/`),
-  createAnimal: (data: Partial<Animal>) => api.post<Animal>('/animales/', data),
-  updateAnimal: (id: number, data: Partial<Animal>) => api.patch<Animal>(`/animales/${id}/`, data),
+  createAnimal: (data: Partial<Animal> | FormData) =>
+    api.post<Animal>('/animales/', data, data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined),
+  updateAnimal: (id: number, data: Partial<Animal> | FormData) =>
+    api.patch<Animal>(`/animales/${id}/`, data, data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined),
   deleteAnimal: (id: number) => api.delete(`/animales/${id}/`),
+  trazabilidad: (id: number) => api.get<TrazabilidadResponse>(`/animales/${id}/trazabilidad/`),
+  pesajes: (id: number) => api.get<PesajePoint[]>(`/animales/${id}/pesajes/`),
+  transicionesEstado: () => api.get<TransicionesEstadoData>('/animales/transiciones-estado/'),
+  historialEstados: () => api.get<EventoAnimal[]>('/animales/historial-estados/'),
+  cambiarEstado: (id: number, data: { estado: string; motivo: string; causa_enfermedad?: boolean; severidad?: string }) =>
+    api.post<CambioEstadoResult>(`/animales/${id}/cambiar-estado/`, data),
+  cambiarEstadoMasivo: (data: { animal_ids: number[]; estado: string; motivo: string; causa_enfermedad?: boolean; severidad?: string }) =>
+    api.post<CambioEstadoMasivoResult>('/animales/cambiar-estado-masivo/', data),
   addEvento: (animalId: number, data: Partial<EventoAnimal>) =>
     api.post<EventoAnimal>(`/animales/${animalId}/eventos/`, data),
   lotes: () => api.get<{ results: Lote[] }>('/lotes/'),

@@ -1,0 +1,59 @@
+import { m as Config, b as Logger, d as IR, U as UserConfig, n as Input, W as WatchValues } from './types.d-CGoxqmT9.js';
+import { getResolvedInput } from '@hey-api/json-schema-ref-parser';
+import 'semver';
+import '@hey-api/codegen-core';
+import 'node:fs';
+import 'typescript';
+
+/**
+ * @internal
+ * Parse the resolved OpenAPI specification. This will populate and return
+ * `context` with intermediate representation obtained from the parsed spec.
+ */
+declare const parseOpenApiSpec: ({ config, dependencies, logger, spec, }: {
+    config: Config;
+    dependencies: Record<string, string>;
+    logger: Logger;
+    spec: unknown;
+}) => IR.Context | undefined;
+
+type ConfigResult = {
+    config: Config;
+    errors: ReadonlyArray<Error>;
+    jobIndex: number;
+};
+type Configs = {
+    dependencies: Record<string, string>;
+    results: ReadonlyArray<ConfigResult>;
+};
+/**
+ * @internal
+ */
+declare const initConfigs: ({ logger, userConfigs, }: {
+    logger: Logger;
+    userConfigs: ReadonlyArray<UserConfig>;
+}) => Promise<Configs>;
+
+type SpecResponse = {
+    arrayBuffer: ArrayBuffer | undefined;
+    error?: never;
+    resolvedInput: ReturnType<typeof getResolvedInput>;
+    response?: never;
+};
+type SpecError = {
+    arrayBuffer?: never;
+    error: 'not-modified' | 'not-ok';
+    resolvedInput?: never;
+    response: Response;
+};
+/**
+ * @internal
+ */
+declare const getSpec: ({ fetchOptions, inputPath, timeout, watch, }: {
+    fetchOptions?: RequestInit;
+    inputPath: Input["path"];
+    timeout: number | undefined;
+    watch: WatchValues;
+}) => Promise<SpecResponse | SpecError>;
+
+export { getSpec, initConfigs, parseOpenApiSpec };

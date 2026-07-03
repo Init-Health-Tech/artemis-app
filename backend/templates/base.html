@@ -1,17 +1,21 @@
 {% load render_bundle from webpack_loader %}
+{% load static %}
 
 <!DOCTYPE html>
-<html class="no-js" lang="en">
+<html class="dark no-js" lang="es">
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <title>{% block title %}{% endblock %}</title>
-  <meta name="description" content="" />
+  <title>{% block title %}ArtemisApp{% endblock %}</title>
+  <meta name="description" content="ArtemisApp — Control de ganado bovino" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <link rel="shortcut icon" href="#" />
-
-  <!-- Webpack rendered CSS -->
+  <meta name="theme-color" content="#121414" />
+  <link rel="icon" href="{% static 'images/brand/favicon.ico' %}" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/brand/favicon-32.png' %}" />
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/brand/favicon-16.png' %}" />
+  <link rel="apple-touch-icon" href="{% static 'images/brand/apple-touch-icon.png' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   {% render_bundle 'main' 'css' %}
 </head>
 

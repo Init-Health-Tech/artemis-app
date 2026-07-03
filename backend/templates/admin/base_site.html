@@ -1,5 +1,5 @@
 {% extends "admin/base.html" %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
@@ -16,11 +16,25 @@
         content: "{{ ADMIN_ENVIRONMENT_LABEL|escapejs }}";
         background-color: {{ ADMIN_ENVIRONMENT_BACKGROUND_COLOR }};
     }
+    #site-name a {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    #site-name img {
+        height: 28px;
+        width: 28px;
+    }
 </style>
 {% endblock %}
 
 {% block branding %}
-    <h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+    <h1 id="site-name">
+        <a href="{% url 'admin:index' %}">
+            <img alt="ArtemisApp" src="{% static 'images/brand/artemis-logo.png' %}" />
+            {{ site_header|default:_('Django administration') }}
+        </a>
+    </h1>
     {% if user.is_anonymous %}
         {% include "admin/color_theme_toggle.html" %}
     {% endif %}

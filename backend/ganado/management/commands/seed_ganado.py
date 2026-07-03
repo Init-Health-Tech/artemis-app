@@ -142,24 +142,26 @@ class Command(BaseCommand):
                     usuario_responsable=user,
                 )
 
-        # Eventos especiales en animales concretos
+        # Eventos especiales en animales concretos (por numero_interno, no índices de lista)
+        bov021 = Animal.objects.get(numero_interno="BOV-021")
         EventoAnimal.objects.create(
-            animal=animales[20],
+            animal=bov021,
             tipo=EventoAnimal.Tipo.ENFERMEDAD,
+            severidad=EventoAnimal.Severidad.GRAVE,
             fecha=timezone.now() - timedelta(days=5),
             descripcion="Cuarentena sanitaria — observación por fiebre",
             usuario_responsable=user,
         )
 
         EventoAnimal.objects.create(
-            animal=animales[21],
+            animal=Animal.objects.get(numero_interno="BOV-022"),
             tipo=EventoAnimal.Tipo.VENTA,
             fecha=timezone.now() - timedelta(days=10),
             descripcion="Vendido a intermediario — $18,500 MXN",
             usuario_responsable=user,
         )
         EventoAnimal.objects.create(
-            animal=animales[22],
+            animal=Animal.objects.get(numero_interno="BOV-023"),
             tipo=EventoAnimal.Tipo.MUERTE,
             fecha=timezone.now() - timedelta(days=30),
             descripcion="Muerte por neumonía — descartado del hato",
@@ -212,6 +214,46 @@ class Command(BaseCommand):
             fecha=timezone.localdate(),
             notas="Suplemento melaza — ración tarde",
         )
+
+        # Pesajes históricos para gráficas (BOV-001)
+        bov001 = Animal.objects.filter(numero_interno="BOV-001").first()
+        if bov001:
+            for days_ago, peso in [(90, 280), (60, 310), (30, 335), (7, 360)]:
+                EventoAnimal.objects.create(
+                    animal=bov001,
+                    tipo=EventoAnimal.Tipo.PESAJE,
+                    fecha=timezone.now() - timedelta(days=days_ago),
+                    descripcion="Pesaje histórico demo",
+                    valor_numerico=Decimal(str(peso)),
+                    usuario_responsable=user,
+                )
+            bov001.peso_actual = Decimal("360")
+            bov001.proxima_revision = timezone.localdate() + timedelta(days=5)
+            bov001.save(update_fields=["peso_actual", "proxima_revision", "modified"])
+
+        # Revisiones próximas para alertas dashboard
+        for animal in Animal.objects.filter(estado=Animal.Estado.ACTIVO)[1:4]:
+            animal.proxima_revision = timezone.localdate() + timedelta(days=4)
+            animal.save(update_fields=["proxima_revision", "modified"])
+
+        # Demo sobrepoblación: reducir capacidad de Corral Maternidad
+        lotes[1].capacidad = 5
+        lotes[1].save(update_fields=["capacidad", "modified"])
+
+        # Fotos placeholder para demo
+        try:
+            from io import BytesIO
+
+            from django.core.files.base import ContentFile
+            from PIL import Image
+
+            for animal in Animal.objects.filter(numero_interno__in=["BOV-001", "BOV-002", "BOV-003", "BOV-004", "BOV-005"]):
+                img = Image.new("RGB", (400, 300), color=(46, 90, 52))
+                buffer = BytesIO()
+                img.save(buffer, format="JPEG")
+                animal.foto.save(f"{animal.numero_interno}.jpg", ContentFile(buffer.getvalue()), save=True)
+        except ImportError:
+            self.stdout.write(self.style.WARNING("Pillow no disponible, omitiendo fotos demo."))
 
         self.stdout.write(
             self.style.SUCCESS(

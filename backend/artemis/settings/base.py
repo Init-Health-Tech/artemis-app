@@ -76,6 +76,7 @@ TEMPLATES = [
                 "common.context_processors.admin_environment_label",
                 "common.context_processors.sentry_dsn",
                 "common.context_processors.commit_sha",
+                "common.context_processors.demo_login_hint",
             ],
             "loaders": [
                 (

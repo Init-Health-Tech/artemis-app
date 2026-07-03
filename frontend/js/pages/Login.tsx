@@ -1,20 +1,27 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { authApi } from '@/js/api/ganado';
 import ArtemisLogo from '@/js/components/ArtemisLogo';
 
 const Login = () => {
-  const [email, setEmail] = useState('admin@artemis.local');
-  const [password, setPassword] = useState('admin123');
+  const demoEmail =
+    document.querySelector('meta[name="artemis-demo-email"]')?.getAttribute('content') || '';
+  const [email, setEmail] = useState(demoEmail || 'admin@artemis.local');
+  const [password, setPassword] = useState(demoEmail ? 'demo123' : 'admin123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [csrfReady, setCsrfReady] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    authApi.session().finally(() => setCsrfReady(true));
-  }, []);
+    authApi
+      .session()
+      .then((res) => {
+        if (res.data.authenticated) navigate('/dashboard', { replace: true });
+      })
+      .finally(() => setCsrfReady(true));
+  }, [navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -22,7 +29,7 @@ const Login = () => {
     setError('');
     try {
       await authApi.login(email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch {
       setError('Credenciales inválidas');
     } finally {
@@ -67,6 +74,11 @@ const Login = () => {
         >
           {loading ? 'Entrando...' : csrfReady ? 'Iniciar sesión' : 'Preparando...'}
         </button>
+        <p className="mt-6 text-center text-sm text-on-surface-variant">
+          <Link className="text-primary hover:underline" to="/">
+            ← Volver al inicio
+          </Link>
+        </p>
       </form>
     </div>
   );

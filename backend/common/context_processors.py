@@ -44,3 +44,10 @@ def sentry_dsn(request):
 
 def commit_sha(request):
     return {"COMMIT_SHA": settings.COMMIT_SHA}
+
+
+def demo_login_hint(request):
+    return {
+        "DEMO_USER_EMAIL": getattr(settings, "DEMO_USER_EMAIL", ""),
+        "DEMO_USER_PASSWORD": getattr(settings, "DEMO_USER_PASSWORD", ""),
+    }

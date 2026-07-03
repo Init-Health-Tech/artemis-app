@@ -5,7 +5,7 @@ import { authApi } from '@/js/api/ganado';
 import ArtemisLogo from '@/js/components/ArtemisLogo';
 
 const navItems = [
-  { to: '/', label: 'Dashboard', icon: 'dashboard' },
+  { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
   { to: '/animales', label: 'Animales', icon: 'pets' },
   { to: '/estados', label: 'Estados', icon: 'swap_horiz' },
   { to: '/rfid', label: 'RFID', icon: 'nfc' },
@@ -34,7 +34,7 @@ const AppLayout = () => {
 
   const handleLogout = async () => {
     await authApi.logout();
-    navigate('/login');
+    navigate('/');
   };
 
   if (!ready) {
@@ -63,7 +63,7 @@ const AppLayout = () => {
                     : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
                 ].join(' ')
               }
-              end={item.to === '/'}
+              end={item.to === '/dashboard'}
               to={item.to}
             >
               <span className="material-symbols-outlined text-[20px]">{item.icon}</span>

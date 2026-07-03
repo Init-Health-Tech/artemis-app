@@ -11,7 +11,7 @@ class TestIndexView(TestCaseUtils):
         self.assertResponse200(response)
 
     def test_spa_routes_serve_index_on_refresh(self):
-        for path in ("/rfid", "/animales", "/lotes", "/inventario", "/estados", "/login"):
+        for path in ("/", "/dashboard", "/rfid", "/animales", "/lotes", "/inventario", "/estados", "/login"):
             response = self.auth_client.get(path)
             self.assertEqual(response.status_code, 200, path)
 

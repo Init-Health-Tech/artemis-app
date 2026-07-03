@@ -16,7 +16,7 @@ module.exports = (env, argv) => {
   };
   const productionOutput = {
     path: path.resolve('./frontend/webpack_bundles/'),
-    publicPath: 'auto',
+    publicPath: '/static/',
     filename: '[name]-[chunkhash].js',
     clean: true,
   };
@@ -41,6 +41,19 @@ module.exports = (env, argv) => {
           test: /\.(js|mjs|jsx|ts|tsx)$/,
           use: {
             loader: 'swc-loader',
+            options: {
+              jsc: {
+                parser: {
+                  syntax: 'typescript',
+                  tsx: true,
+                },
+                transform: {
+                  react: {
+                    runtime: 'automatic',
+                  },
+                },
+              },
+            },
           },
         },
         {

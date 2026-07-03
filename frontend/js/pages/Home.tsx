@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import DjangoImgSrc from '@/assets/images/django-logo-negative.png';
+import DjangoPositiveImgSrc from '@/assets/images/django-logo-positive.png';
 import { restRestCheckRetrieve } from '@/js/api';
 import { TopNav } from '@/js/components';
 
@@ -19,7 +20,10 @@ const Home = () => {
     <>
       <TopNav />
       <h2 className="text-4xl mb-2">Static assets</h2>
-      <div className="text-[#092e20] text-[11pt] bg-no-repeat bg-[auto_200px] bg-center h-[300px] bg-[url('../assets/images/django-logo-positive.png')]">
+      <div
+        className="text-[#092e20] text-[11pt] bg-no-repeat bg-[auto_200px] bg-center h-[300px]"
+        style={{ backgroundImage: `url(${DjangoPositiveImgSrc})` }}
+      >
         If you are seeing the green Django logo on a white background and this text color is
         #092e20, frontend static files serving is working:
       </div>

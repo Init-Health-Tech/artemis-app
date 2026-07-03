@@ -83,27 +83,27 @@ const AnimalDetail = () => {
             )}
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 sm:gap-2">
           <Link
-            className="rounded border border-tertiary/40 px-3 py-1.5 text-sm text-tertiary hover:bg-tertiary/10"
+            className="min-h-[44px] rounded border border-tertiary/40 px-3 py-2 text-sm text-tertiary hover:bg-tertiary/10"
             to={`/estados?animal_id=${id}`}
           >
             Cambiar estado
           </Link>
           <Link
-            className="rounded border border-primary/40 px-3 py-1.5 text-sm text-primary hover:bg-primary/10"
+            className="min-h-[44px] rounded border border-primary/40 px-3 py-2 text-sm text-primary hover:bg-primary/10"
             to={`/animales/${id}/trazabilidad`}
           >
             Ver trazabilidad completa
           </Link>
           <Link
-            className="rounded border border-outline-variant px-3 py-1.5 text-sm hover:bg-surface-container-high"
+            className="min-h-[44px] rounded border border-outline-variant px-3 py-2 text-sm hover:bg-surface-container-high"
             to={`/animales/${id}/editar`}
           >
             Editar
           </Link>
           <button
-            className="rounded border border-error-container px-3 py-1.5 text-sm text-error hover:bg-error-container/20"
+            className="min-h-[44px] rounded border border-error-container px-3 py-2 text-sm text-error hover:bg-error-container/20"
             type="button"
             onClick={handleDelete}
           >

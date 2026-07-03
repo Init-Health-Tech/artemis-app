@@ -18,7 +18,7 @@ const LoteDetail = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <Link className="text-sm text-on-surface-variant hover:text-primary" to="/lotes">← Lotes</Link>
           <h2 className="mt-1 text-2xl font-semibold">{lote.nombre}</h2>
@@ -81,6 +81,7 @@ const LoteDetail = () => {
         <h3 className="border-b border-outline-variant px-5 py-3 text-sm font-semibold uppercase tracking-wider text-on-surface-variant">
           Animales en el lote
         </h3>
+        <div className="table-scroll">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-outline-variant text-left text-xs uppercase text-on-surface-variant">
@@ -105,6 +106,7 @@ const LoteDetail = () => {
             ))}
           </tbody>
         </table>
+        </div>
       </section>
     </div>
   );

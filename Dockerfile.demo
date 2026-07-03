@@ -10,7 +10,7 @@ RUN echo "shamefully-hoist=true" > .npmrc \
     && corepack enable && corepack prepare pnpm@10 --activate \
     && pnpm install --frozen-lockfile=false
 
-COPY webpack.config.js tsconfig.json postcss.config.mjs ./
+COPY webpack.config.js tsconfig.json postcss.config.mjs .swcrc ./
 COPY frontend ./frontend
 
 RUN NODE_ENV=production pnpm exec webpack --progress --bail --mode=production

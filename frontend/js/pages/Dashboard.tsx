@@ -42,9 +42,9 @@ const Dashboard = () => {
     <div className="space-y-6">
       <DemoBanner />
 
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <ArtemisLogo showText={false} size="lg" />
+      <header className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <ArtemisLogo showText={false} className="hidden sm:flex" size="lg" />
           <div>
             <p className="text-xs font-medium uppercase tracking-widest text-primary">Panel de control</p>
             <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-on-surface md:text-3xl">
@@ -53,7 +53,7 @@ const Dashboard = () => {
             <p className="mt-1 capitalize text-sm text-on-surface-variant">{hoy}</p>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
           <Link
             className="inline-flex items-center gap-2 rounded-xl border border-outline-variant bg-surface-container-high px-4 py-2 text-sm font-medium transition hover:border-primary/40"
             to="/rfid"

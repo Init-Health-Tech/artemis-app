@@ -34,7 +34,7 @@ services:
       DATABASE_URL: postgres://artemis:artemis_demo@db:5432/artemis
       SECRET_KEY: ${SECRET_KEY:-demo-secret-cambiar-en-produccion-real}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,artemis.init.com.mx,app}
-      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-http://localhost,http://127.0.0.1,http://artemis.init.com.mx}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-http://localhost,http://127.0.0.1,http://artemis.init.com.mx,https://artemis.init.com.mx}
       HOST: ${ARTEMIS_PUBLIC_URL:-http://artemis.init.com.mx}
       ARTEMIS_DOMAIN: ${ARTEMIS_DOMAIN:-artemis.init.com.mx}
       DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-demo@artemis.local}

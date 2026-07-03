@@ -50,7 +50,6 @@ def int_or(value: str | None, default: int) -> int:
 
 
 PORT_KEYS = [
-    ("ARTEMIS_HTTP_PORT", 18080),
     ("ARTEMIS_DEV_BACKEND_PORT", 18000),
     ("ARTEMIS_DEV_FRONTEND_PORT", 13000),
     ("ARTEMIS_DEV_DB_PORT", 15432),
@@ -59,25 +58,33 @@ PORT_KEYS = [
     ("ARTEMIS_DEV_MAILHOG_UI_PORT", 18025),
 ]
 
+# Puerto fijo: nginx en el host apunta a 127.0.0.1:18080 (ver docker/nginx/artemis.init.com.mx.conf)
+ARTEMIS_HTTP_PORT_KEY = ("ARTEMIS_HTTP_PORT", 18080)
+
 
 def main() -> None:
     base = parse_env(ENV_OUT) or parse_env(ENV_EXAMPLE)
     domain = base.get("ARTEMIS_DOMAIN", "artemis.init.com.mx")
 
     resolved: dict[str, str] = dict(base)
+    http_key, http_default = ARTEMIS_HTTP_PORT_KEY
+    resolved[http_key] = str(int_or(base.get(http_key), http_default))
+
     for key, default in PORT_KEYS:
         preferred = int_or(base.get(key), default)
         port = find_free_port(preferred)
         resolved[key] = str(port)
 
-    http_port = int(resolved["ARTEMIS_HTTP_PORT"])
+    http_port = int(resolved[http_key])
     if http_port == 80:
-        resolved["ARTEMIS_PUBLIC_URL"] = f"http://{domain}"
+        resolved["ARTEMIS_PUBLIC_URL"] = f"https://{domain}"
     else:
-        resolved["ARTEMIS_PUBLIC_URL"] = f"http://{domain}:{http_port}"
+        # Tras nginx + certbot la URL pública es sin puerto; el puerto 18080 es solo interno.
+        resolved["ARTEMIS_PUBLIC_URL"] = f"https://{domain}"
 
     csrf_origins = {
         f"http://{domain}",
+        f"https://{domain}",
         "http://localhost",
         "http://127.0.0.1",
     }
@@ -101,6 +108,7 @@ def main() -> None:
 
     ENV_OUT.write_text("\n".join(lines) + "\n")
     print(f"Escrito {ENV_OUT}")
+    print(f"  {http_key}={resolved[http_key]} (fijo — nginx -> 127.0.0.1:{resolved[http_key]})")
     for key, default in PORT_KEYS:
         preferred = int_or(base.get(key), default)
         chosen = int(resolved[key])

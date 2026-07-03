@@ -55,10 +55,10 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-background text-on-surface">
       <header className="sticky top-0 z-50 border-b border-outline-variant/60 bg-background/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
           <ArtemisLogo size="sm" subtitle="Ganado bovino" />
           <Link
-            className="rounded-xl bg-primary-container px-5 py-2.5 text-sm font-semibold text-on-primary-container transition hover:opacity-90"
+            className="shrink-0 rounded-xl bg-primary-container px-4 py-2.5 text-sm font-semibold text-on-primary-container transition hover:opacity-90 sm:px-5"
             to="/login"
           >
             Iniciar sesión
@@ -66,14 +66,14 @@ const Homepage = () => {
         </div>
       </header>
 
-      <section className="relative overflow-hidden px-6 pb-20 pt-16">
+      <section className="relative overflow-hidden px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(147,214,149,0.12)_0%,_transparent_55%)]" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-primary">
               Gestión ganadera moderna
             </p>
-            <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+            <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
               Control total de tu ganado bovino, en un solo lugar
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-on-surface-variant">
@@ -99,7 +99,7 @@ const Homepage = () => {
             </p>
           </div>
           <div className="flex justify-center lg:justify-end">
-            <div className="rounded-3xl border border-outline-variant/60 bg-surface-container p-10 shadow-2xl shadow-primary/5">
+            <div className="rounded-3xl border border-outline-variant/60 bg-surface-container p-6 shadow-2xl shadow-primary/5 sm:p-10">
               <ArtemisLogo showText={false} size="xl" />
               <ul className="mt-8 space-y-3 text-sm text-on-surface-variant">
                 <li className="flex items-center gap-2">
@@ -120,7 +120,7 @@ const Homepage = () => {
         </div>
       </section>
 
-      <section className="border-y border-outline-variant/60 bg-surface-container px-6 py-16" id="modulos">
+      <section className="border-y border-outline-variant/60 bg-surface-container px-4 py-12 sm:px-6 sm:py-16" id="modulos">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-center text-2xl font-bold md:text-3xl">Todo lo que necesita tu operación</h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-on-surface-variant">
@@ -143,7 +143,7 @@ const Homepage = () => {
         </div>
       </section>
 
-      <section className="px-6 py-16">
+      <section className="px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-center text-2xl font-bold">Cómo funciona</h2>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -161,7 +161,7 @@ const Homepage = () => {
         </div>
       </section>
 
-      <section className="border-t border-outline-variant/60 bg-surface-container px-6 py-16">
+      <section className="border-t border-outline-variant/60 bg-surface-container px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-2xl font-bold md:text-3xl">Listo para conocer ArtemisApp</h2>
           <p className="mt-4 text-on-surface-variant">
@@ -176,7 +176,7 @@ const Homepage = () => {
         </div>
       </section>
 
-      <footer className="border-t border-outline-variant/60 px-6 py-8 text-center text-sm text-on-surface-variant">
+      <footer className="border-t border-outline-variant/60 px-4 py-8 text-center text-sm text-on-surface-variant sm:px-6">
         ArtemisApp · Control de ganado bovino
       </footer>
     </div>

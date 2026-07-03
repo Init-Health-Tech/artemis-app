@@ -3,7 +3,12 @@ Settings para despliegue demo en producción (Docker).
 Sin SSL forzado, sin Celery/RabbitMQ, frontend empaquetado con Webpack.
 """
 
+import os
+
 from decouple import Csv, config
+
+# base.py exige REDIS_URL para django-defender; en demo el middleware está desactivado.
+os.environ.setdefault("REDIS_URL", "redis://127.0.0.1:6379/0")
 
 from .base import *
 
@@ -31,6 +36,9 @@ SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 SECURE_HSTS_SECONDS = 0
+
+# Fotos de animales en disco local (FileSystemStorage)
+SERVE_MEDIA = True
 
 STATIC_ROOT = base_dir_join("staticfiles")
 STATIC_URL = "/static/"

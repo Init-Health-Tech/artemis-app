@@ -62,7 +62,7 @@ const Inventario = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold">Inventario de Alimentos</h2>
         <button
           className="rounded bg-primary-container px-4 py-2 text-sm font-semibold text-on-primary-container"
@@ -124,7 +124,7 @@ const Inventario = () => {
       {alimentos.length === 0 ? (
         <EmptyState icon="inventory_2" title="Sin alimentos en inventario" />
       ) : (
-        <div className="overflow-hidden rounded-lg border border-outline-variant">
+        <div className="table-scroll overflow-hidden rounded-lg border border-outline-variant">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-outline-variant bg-surface-container text-left text-xs uppercase text-on-surface-variant">
@@ -207,6 +207,7 @@ const Inventario = () => {
               <h4 className="border-b border-outline-variant px-5 py-2 text-xs font-semibold uppercase text-on-surface-variant">
                 Últimos movimientos
               </h4>
+              <div className="table-scroll">
               <table className="w-full text-sm">
                 <tbody>
                   {movimientos.map((m) => (
@@ -219,6 +220,7 @@ const Inventario = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
             </section>
           )}
         </div>

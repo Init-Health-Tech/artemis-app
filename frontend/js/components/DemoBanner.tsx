@@ -7,10 +7,10 @@ const DemoBanner = () => {
   if (!visible) return null;
 
   return (
-    <div className="mb-4 flex items-start justify-between gap-4 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm">
+    <div className="mb-4 flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm sm:flex-row sm:items-start sm:justify-between">
       <div className="flex gap-3">
         <img alt="" className="mt-0.5 h-8 w-8 shrink-0 object-contain" src={logoSrc} />
-        <div>
+        <div className="min-w-0">
           <p className="font-semibold text-primary">Modo Demo — ArtemisApp</p>
           <p className="mt-1 text-on-surface-variant">
           Prueba el flujo RFID con tag <code className="text-primary">RFID-1001</code> o un tag nuevo como{' '}

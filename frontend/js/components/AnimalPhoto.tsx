@@ -8,7 +8,7 @@ interface AnimalPhotoProps {
 const sizes = {
   sm: 'h-8 w-8',
   md: 'h-12 w-12',
-  lg: 'h-40 w-full max-w-xs',
+  lg: 'h-40 w-full max-w-full sm:max-w-xs',
 };
 
 const AnimalPhoto = ({ fotoUrl, numeroInterno, size = 'md', className = '' }: AnimalPhotoProps) => {

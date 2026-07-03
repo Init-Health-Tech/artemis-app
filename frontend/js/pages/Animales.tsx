@@ -57,10 +57,10 @@ const Animales = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold">Animales</h2>
         <Link
-          className="rounded bg-primary-container px-4 py-2 text-sm font-semibold text-on-primary-container hover:opacity-90"
+          className="inline-flex min-h-[44px] items-center justify-center rounded bg-primary-container px-4 py-2 text-sm font-semibold text-on-primary-container hover:opacity-90"
           to="/animales/nuevo"
         >
           + Nuevo animal
@@ -114,7 +114,7 @@ const Animales = () => {
           title="No se encontraron animales"
         />
       ) : (
-        <div className="overflow-hidden rounded-lg border border-outline-variant">
+        <div className="table-scroll overflow-hidden rounded-lg border border-outline-variant">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-outline-variant bg-surface-container text-left text-xs uppercase text-on-surface-variant">

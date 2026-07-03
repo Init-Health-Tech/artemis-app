@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from 'react-router';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
 
 import { authApi } from '@/js/api/ganado';
@@ -16,7 +16,9 @@ const navItems = [
 const AppLayout = () => {
   const [email, setEmail] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     authApi
@@ -32,6 +34,17 @@ const AppLayout = () => {
       .catch(() => navigate('/login'));
   }, [navigate]);
 
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
+
   const handleLogout = async () => {
     await authApi.logout();
     navigate('/');
@@ -45,24 +58,50 @@ const AppLayout = () => {
     );
   }
 
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    [
+      'flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition',
+      isActive
+        ? 'border-l-2 border-primary bg-surface-container text-primary'
+        : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
+    ].join(' ');
+
   return (
-    <div className="flex min-h-screen bg-background">
-      <aside className="fixed left-0 top-0 flex h-full w-[260px] flex-col border-r border-outline-variant bg-surface-container-low">
-        <div className="flex h-16 items-center border-b border-outline-variant px-5">
+    <div className="flex min-h-screen min-h-[100dvh] bg-background">
+      {menuOpen && (
+        <button
+          aria-label="Cerrar menú"
+          className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+          type="button"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
+      <aside
+        className={[
+          'fixed left-0 top-0 z-50 flex h-full w-[min(100vw-2.5rem,280px)] flex-col',
+          'border-r border-outline-variant bg-surface-container-low',
+          'transition-transform duration-200 ease-out',
+          'lg:w-[260px] lg:translate-x-0',
+          menuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        ].join(' ')}
+      >
+        <div className="flex h-14 items-center justify-between border-b border-outline-variant px-4 lg:h-16 lg:px-5">
           <ArtemisLogo size="sm" subtitle="Ganado bovino" textClassName="text-base" />
+          <button
+            aria-label="Cerrar menú"
+            className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container lg:hidden"
+            type="button"
+            onClick={() => setMenuOpen(false)}
+          >
+            <span className="material-symbols-outlined text-[22px]">close</span>
+          </button>
         </div>
-        <nav className="flex-1 space-y-1 p-3">
+        <nav className="flex-1 space-y-1 overflow-y-auto p-3">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
-              className={({ isActive }) =>
-                [
-                  'flex items-center gap-3 rounded px-3 py-2.5 text-sm font-medium transition',
-                  isActive
-                    ? 'border-l-2 border-primary bg-surface-container text-primary'
-                    : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface',
-                ].join(' ')
-              }
+              className={navLinkClass}
               end={item.to === '/dashboard'}
               to={item.to}
             >
@@ -72,9 +111,9 @@ const AppLayout = () => {
           ))}
         </nav>
         <div className="border-t border-outline-variant p-4 text-xs text-on-surface-variant">
-          <div>{email}</div>
+          <div className="truncate">{email}</div>
           <button
-            className="mt-2 text-primary hover:underline"
+            className="mt-2 min-h-[44px] text-primary hover:underline"
             type="button"
             onClick={handleLogout}
           >
@@ -82,15 +121,25 @@ const AppLayout = () => {
           </button>
         </div>
       </aside>
-      <div className="ml-[260px] flex flex-1 flex-col">
-        <header className="flex h-16 items-center gap-3 border-b border-outline-variant bg-surface-container px-6">
+
+      <div className="flex min-w-0 flex-1 flex-col lg:ml-[260px]">
+        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-outline-variant bg-surface-container/95 px-4 backdrop-blur sm:px-6 lg:h-16">
+          <button
+            aria-expanded={menuOpen}
+            aria-label="Abrir menú"
+            className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-high lg:hidden"
+            type="button"
+            onClick={() => setMenuOpen(true)}
+          >
+            <span className="material-symbols-outlined text-[24px]">menu</span>
+          </button>
           <ArtemisLogo showText={false} size="sm" />
-          <div>
-            <h1 className="text-sm font-semibold text-on-surface">ArtemisApp</h1>
-            <p className="text-xs text-on-surface-variant">Control de ganado bovino</p>
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-sm font-semibold text-on-surface">ArtemisApp</h1>
+            <p className="truncate text-xs text-on-surface-variant">Control de ganado bovino</p>
           </div>
         </header>
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6">
           <Outlet />
         </main>
       </div>

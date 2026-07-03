@@ -166,7 +166,7 @@ const Estados = () => {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-3">
-        <section className="overflow-hidden rounded-2xl border border-outline-variant/60 bg-surface-container xl:col-span-2">
+        <section className="table-scroll overflow-hidden rounded-2xl border border-outline-variant/60 bg-surface-container xl:col-span-2">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-outline-variant bg-surface-container-high text-left text-xs uppercase text-on-surface-variant">

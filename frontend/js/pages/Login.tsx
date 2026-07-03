@@ -38,7 +38,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
       <form
         className="w-full max-w-sm rounded-2xl border border-outline-variant bg-surface-container p-8 shadow-xl shadow-black/20"
         onSubmit={handleSubmit}

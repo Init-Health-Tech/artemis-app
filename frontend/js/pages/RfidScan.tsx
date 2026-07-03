@@ -74,7 +74,7 @@ const RfidScan = () => {
       </div>
 
       <form
-        className="mx-auto max-w-2xl space-y-4 rounded-lg border border-outline-variant bg-surface-container p-6"
+        className="mx-auto max-w-2xl space-y-4 rounded-lg border border-outline-variant bg-surface-container p-4 sm:p-6"
         onSubmit={handleScan}
       >
         <label className="block">
@@ -89,7 +89,7 @@ const RfidScan = () => {
             onChange={(e) => setTag(e.target.value)}
           />
         </label>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="block">
             <span className="mb-1 block text-sm text-on-surface-variant">Potrero</span>
             <select
@@ -169,6 +169,7 @@ const RfidScan = () => {
         <h3 className="border-b border-outline-variant px-5 py-3 text-sm font-semibold uppercase tracking-wider text-on-surface-variant">
           Historial de lecturas
         </h3>
+        <div className="table-scroll">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-outline-variant text-left text-xs uppercase text-on-surface-variant">
@@ -201,6 +202,7 @@ const RfidScan = () => {
             ))}
           </tbody>
         </table>
+        </div>
       </section>
     </div>
   );

@@ -1,9 +1,4 @@
-# Sitio principal — dominio configurado en ARTEMIS_DOMAIN
-{$ARTEMIS_DOMAIN} {
-	reverse_proxy app:8000
-}
-
-# Acceso local sin editar DNS (opcional)
-http://localhost, http://127.0.0.1 {
+# Proxy HTTP interno — TLS lo termina nginx en el host (ver docker/nginx/artemis.init.com.mx.conf)
+:80 {
 	reverse_proxy app:8000
 }

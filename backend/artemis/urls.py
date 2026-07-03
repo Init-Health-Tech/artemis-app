@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
+from django.views.static import serve
 
 import django_js_reverse.views
 from common.routes import routes as common_routes
@@ -44,11 +45,22 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-    # SPA catch-all — debe ir al final para no interceptar API/admin/static
-    path("", include("common.urls"), name="common"),
 ]
 
 if settings.DEBUG:
     from django.conf.urls.static import static
 
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+elif getattr(settings, "SERVE_MEDIA", False):
+    urlpatterns += [
+        re_path(
+            r"^media/(?P<path>.*)$",
+            serve,
+            {"document_root": settings.MEDIA_ROOT},
+        ),
+    ]
+
+urlpatterns += [
+    # SPA catch-all — debe ir al final para no interceptar API/admin/static/media
+    path("", include("common.urls"), name="common"),
+]

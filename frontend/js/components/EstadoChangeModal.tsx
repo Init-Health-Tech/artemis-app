@@ -59,9 +59,9 @@ const EstadoChangeModal = ({ open, animales, transiciones, onClose, onSubmit }: 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center sm:p-4">
       <form
-        className="w-full max-w-lg rounded-2xl border border-outline-variant bg-surface-container p-6 shadow-xl"
+        className="max-h-[min(90dvh,100%)] w-full overflow-y-auto rounded-t-2xl border border-outline-variant bg-surface-container p-5 shadow-xl sm:max-w-lg sm:rounded-2xl sm:p-6"
         onSubmit={handleSubmit}
       >
         <div className="mb-5 flex items-start justify-between">
@@ -155,7 +155,7 @@ const EstadoChangeModal = ({ open, animales, transiciones, onClose, onSubmit }: 
               </p>
             )}
 
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <button
                 className="rounded-xl border border-outline-variant px-4 py-2 text-sm"
                 type="button"

@@ -265,15 +265,36 @@ Copia y pega esto en Claude junto con este archivo:
 
 ## Cómo levantar el sistema
 
+### Desarrollo (hot-reload, puertos sin conflictos)
+
 ```bash
-docker compose up -d
-docker compose run --rm backend python manage.py migrate
-docker compose run --rm backend python manage.py seed_ganado --force
+./scripts/docker-dev-up.sh
 ```
 
-- App: http://localhost:8000  
-- Admin: http://localhost:8000/admin/  
-- API Swagger: http://localhost:8000/api/schema/swagger-ui/
+Puertos por defecto (se autoajustan si están ocupados): backend **18000**, frontend **13000**, Postgres **15432**.
+
+### Demo productivo (dominio `artemis.init.com.mx`)
+
+```bash
+./scripts/docker-demo-up.sh
+```
+
+1. Agrega a `/etc/hosts`: `127.0.0.1 artemis.init.com.mx`
+2. Abre la URL que imprime el script (ej. `http://artemis.init.com.mx:18080`)
+3. Login demo: `demo@artemis.local` / `demo123`
+
+Puertos y dominio se configuran en `.env.docker` (copia desde `.env.docker.example`).
+
+### Migraciones y seed (dev)
+
+```bash
+docker compose --env-file .env.docker run --rm backend python manage.py migrate
+docker compose --env-file .env.docker run --rm backend python manage.py seed_ganado --force
+```
+
+- App dev: http://localhost:18000 (o el puerto asignado)
+- Admin: `/admin/`
+- API Swagger: `/api/schema/swagger-ui/`
 
 ---
 

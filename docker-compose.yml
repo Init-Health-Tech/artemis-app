@@ -1,3 +1,9 @@
+# ArtemisApp — desarrollo local
+# Uso recomendado: ./scripts/docker-dev-up.sh
+# Puertos configurables en .env.docker (defaults altos para evitar conflictos)
+
+name: artemis-dev
+
 services:
   db:
     image: "postgres:alpine"
@@ -6,7 +12,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=artemis
     ports:
-      - "5432"
+      - "${ARTEMIS_DEV_DB_PORT:-15432}:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data:delegated
 
@@ -16,7 +22,7 @@ services:
   result:
     image: "redis:alpine"
     ports:
-    - "6379:6379"
+      - "${ARTEMIS_DEV_REDIS_PORT:-16379}:6379"
 
   frontend:
     build:
@@ -26,14 +32,14 @@ services:
       - .:/app/
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - "${ARTEMIS_DEV_FRONTEND_PORT:-13000}:3000"
 
   backend:
     build:
       dockerfile: backend/Dockerfile
       context: .
     ports:
-      - "8000:8000"
+      - "${ARTEMIS_DEV_BACKEND_PORT:-18000}:8000"
     volumes:
       - ./:/home/user/app/
     env_file: backend/.env
@@ -56,11 +62,11 @@ services:
       - broker
       - result
 
-  mailhog: # service for faking a SMTP server
+  mailhog:
     image: mailhog/mailhog
     ports:
-      - '1025:1025' # smtp server
-      - '8025:8025' # web ui
+      - "${ARTEMIS_DEV_MAILHOG_SMTP_PORT:-11025}:1025"
+      - "${ARTEMIS_DEV_MAILHOG_UI_PORT:-18025}:8025"
 
 volumes:
   dbdata:

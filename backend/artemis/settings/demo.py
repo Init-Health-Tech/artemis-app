@@ -22,6 +22,10 @@ CSRF_TRUSTED_ORIGINS = config(
 
 HOST = config("HOST", default="http://localhost:8000")
 
+USE_X_FORWARDED_HOST = config("USE_X_FORWARDED_HOST", default=False, cast=bool)
+if USE_X_FORWARDED_HOST:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # Demo HTTP (sin proxy TLS)
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False

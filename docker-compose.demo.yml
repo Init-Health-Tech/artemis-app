@@ -1,5 +1,10 @@
 # ArtemisApp — Docker demo productivo
-# Uso: docker compose -f docker-compose.demo.yml up -d --build
+# Uso recomendado: ./scripts/docker-demo-up.sh
+#
+# Dominio: artemis.init.com.mx (ver .env.docker)
+# Puertos: se autoasignan si el preferido está ocupado (scripts/resolve-docker-ports.py)
+
+name: artemis-demo
 
 services:
   db:
@@ -16,32 +21,50 @@ services:
       timeout: 5s
       retries: 10
       start_period: 5s
+    # Sin puerto publicado — solo red interna (no pelea con Postgres local)
 
   app:
     build:
       context: .
       dockerfile: Dockerfile.demo
-    ports:
-      - "8080:8000"
+    expose:
+      - "8000"
     environment:
       DJANGO_SETTINGS_MODULE: artemis.settings.demo
       DATABASE_URL: postgres://artemis:artemis_demo@db:5432/artemis
-      SECRET_KEY: demo-secret-cambiar-en-produccion-real
-      ALLOWED_HOSTS: localhost,127.0.0.1,0.0.0.0
-      CSRF_TRUSTED_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
-      HOST: http://localhost:8080
-      DEMO_USER_EMAIL: demo@artemis.local
-      DEMO_USER_PASSWORD: demo123
-      DEMO_ADMIN_EMAIL: admin@artemis.local
-      DEMO_ADMIN_PASSWORD: admin123
+      SECRET_KEY: ${SECRET_KEY:-demo-secret-cambiar-en-produccion-real}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,artemis.init.com.mx,app}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-http://localhost,http://127.0.0.1,http://artemis.init.com.mx}
+      HOST: ${ARTEMIS_PUBLIC_URL:-http://artemis.init.com.mx}
+      ARTEMIS_DOMAIN: ${ARTEMIS_DOMAIN:-artemis.init.com.mx}
+      DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-demo@artemis.local}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-demo123}
+      DEMO_ADMIN_EMAIL: ${DEMO_ADMIN_EMAIL:-admin@artemis.local}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:-admin123}
       ADMIN_ENVIRONMENT_LABEL: Demo
       GUNICORN_WORKERS: "2"
+      USE_X_FORWARDED_HOST: "true"
     volumes:
       - demomedia:/home/user/app/backend/mediafiles
     depends_on:
       db:
         condition: service_healthy
 
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "${ARTEMIS_HTTP_PORT:-18080}:80"
+    environment:
+      ARTEMIS_DOMAIN: ${ARTEMIS_DOMAIN:-artemis.init.com.mx}
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
 volumes:
   demodb:
   demomedia:
+  caddy_data:
+  caddy_config:

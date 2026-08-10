@@ -1,0 +1,47 @@
+name: Deploy API (VM)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "docker/**"
+      - "Dockerfile.demo"
+      - "docker-compose.demo.yml"
+      - "pyproject.toml"
+      - "poetry.lock"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "webpack.config.js"
+      - "frontend/**"
+      - "scripts/vm-deploy.sh"
+      - "scripts/vm-bootstrap.sh"
+      - ".github/workflows/deploy-api.yml"
+      - ".env.docker.example"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-api-vm
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: SSH deploy to VM
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          port: ${{ secrets.VM_PORT || 22 }}
+          script_stop: true
+          command_timeout: 40m
+          script: |
+            set -euo pipefail
+            APP_DIR="${{ secrets.VM_APP_DIR }}"
+            APP_DIR="${APP_DIR:-/opt/artemis-app}"
+            cd "$APP_DIR"
+            ./scripts/vm-deploy.sh

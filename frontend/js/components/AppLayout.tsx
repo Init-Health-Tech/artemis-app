@@ -1,8 +1,10 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { authApi } from '@/js/api/ganado';
 import ArtemisLogo from '@/js/components/ArtemisLogo';
+import { logoutUser } from '@/js/features/auth/authSlice';
+import type { AppDispatch, RootState } from '@/js/store';
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
@@ -14,25 +16,11 @@ const navItems = [
 ];
 
 const AppLayout = () => {
-  const [email, setEmail] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+  const user = useSelector((s: RootState) => s.auth.user);
+  const dispatch = useDispatch<AppDispatch>();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    authApi
-      .session()
-      .then((res) => {
-        if (!res.data.authenticated) {
-          navigate('/login');
-        } else {
-          setEmail(res.data.email ?? null);
-          setReady(true);
-        }
-      })
-      .catch(() => navigate('/login'));
-  }, [navigate]);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -46,17 +34,9 @@ const AppLayout = () => {
   }, [menuOpen]);
 
   const handleLogout = async () => {
-    await authApi.logout();
+    await dispatch(logoutUser());
     navigate('/');
   };
-
-  if (!ready) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-on-surface-variant">
-        Verificando sesión...
-      </div>
-    );
-  }
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     [
@@ -111,7 +91,7 @@ const AppLayout = () => {
           ))}
         </nav>
         <div className="border-t border-outline-variant p-4 text-xs text-on-surface-variant">
-          <div className="truncate">{email}</div>
+          <div className="truncate">{user?.email}</div>
           <button
             className="mt-2 min-h-[44px] text-primary hover:underline"
             type="button"

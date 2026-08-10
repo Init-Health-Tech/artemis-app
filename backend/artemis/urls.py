@@ -10,7 +10,6 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from ganado.auth_views import LoginView, LogoutView, SessionView
 from ganado.routes import routes as ganado_routes
 from rest_framework.routers import DefaultRouter
 from users.routes import routes as users_routes
@@ -29,9 +28,7 @@ urlpatterns = [
     path("admin/", admin.site.urls, name="admin"),
     path("admin/defender/", include("defender.urls")),
     path("jsreverse/", django_js_reverse.views.urls_js, name="js_reverse"),
-    path("api/auth/login/", LoginView.as_view(), name="auth-login"),
-    path("api/auth/logout/", LogoutView.as_view(), name="auth-logout"),
-    path("api/auth/session/", SessionView.as_view(), name="auth-session"),
+    path("api/auth/", include("users.auth_urls")),
     path("api/", include(router.urls), name="api"),
     # drf-spectacular
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

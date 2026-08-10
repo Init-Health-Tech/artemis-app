@@ -1,25 +1,88 @@
 import axios from 'axios';
-import { parse as cookieParse } from 'cookie';
+
+import authApi from '@/js/authApi';
+import { getApiBaseUrl } from '@/js/config';
+import { logoutUser, setAccessToken } from '@/js/features/auth/authSlice';
+import { store } from '@/js/store';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${getApiBaseUrl()}/api`,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
 
+let isRefreshing = false;
+const subscribers: Array<(token: string | null) => void> = [];
+
+function onRefreshed(token: string | null) {
+  subscribers.forEach((cb) => {
+    cb(token);
+  });
+  subscribers.length = 0;
+}
+
+function addSubscriber(cb: (token: string | null) => void) {
+  subscribers.push(cb);
+}
+
+async function refreshAccessToken(): Promise<string> {
+  const { data } = await authApi.post<{ access: string }>('/auth/jwt/refresh/');
+  store.dispatch(setAccessToken(data.access));
+  return data.access;
+}
+
 api.interceptors.request.use((request) => {
-  const { csrftoken } = cookieParse(document.cookie);
-  if (request.headers && csrftoken) {
-    request.headers['X-CSRFTOKEN'] = csrftoken;
+  const token = store.getState().auth.accessToken;
+  if (token && request.headers) {
+    request.headers.Authorization = `Bearer ${token}`;
   }
   return request;
 });
 
-export interface SessionInfo {
-  authenticated: boolean;
-  email?: string;
-  id?: number;
-}
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config as typeof error.config & {
+      _retry?: boolean;
+    };
+
+    if (error.response?.status !== 401 || originalRequest._retry || !originalRequest) {
+      return Promise.reject(error);
+    }
+
+    const url = String(originalRequest.url ?? '');
+    if (url.includes('/jwt/')) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._retry = true;
+
+    if (!isRefreshing) {
+      isRefreshing = true;
+      void refreshAccessToken()
+        .then((access) => {
+          isRefreshing = false;
+          onRefreshed(access);
+        })
+        .catch(() => {
+          isRefreshing = false;
+          onRefreshed(null);
+          void store.dispatch(logoutUser());
+        });
+    }
+
+    return new Promise((resolve, reject) => {
+      addSubscriber((token: string | null) => {
+        if (!token) {
+          reject(error);
+          return;
+        }
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        resolve(api(originalRequest));
+      });
+    });
+  },
+);
 
 export interface Animal {
   id: number;
@@ -189,12 +252,6 @@ export interface RfidScanResult {
   lote_nuevo?: { id: number; nombre: string } | null;
   tipo_movimiento?: 'traslado' | 'alta' | null;
 }
-
-export const authApi = {
-  session: () => api.get<SessionInfo>('/auth/session/'),
-  login: (email: string, password: string) => api.post('/auth/login/', { email, password }),
-  logout: () => api.post('/auth/logout/'),
-};
 
 export const ganadoApi = {
   dashboard: () => api.get<DashboardData>('/dashboard/'),

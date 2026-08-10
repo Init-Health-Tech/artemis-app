@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 from decouple import config
 from dj_database_url import parse as db_url
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     "import_export",
     "rest_framework",
     "drf_spectacular",
+    "corsheaders",
     "defender",
     "django_guid",
     "django_filters",
@@ -50,6 +52,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django_permissions_policy.PermissionsPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -108,6 +111,39 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+ACCESS_TOKEN_LIFETIME = timedelta(minutes=30)
+REFRESH_TOKEN_LIFETIME = timedelta(days=7)
+JWT_REFRESH_COOKIE_NAME = config("JWT_REFRESH_COOKIE_NAME", default="refresh_token")
+JWT_COOKIE_SAMESITE = config("JWT_COOKIE_SAMESITE", default="Lax")
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": ACCESS_TOKEN_LIFETIME,
+    "REFRESH_TOKEN_LIFETIME": REFRESH_TOKEN_LIFETIME,
+    "ALGORITHM": "HS256",
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+}
+
+REGISTRATION_OPEN = config("REGISTRATION_OPEN", default=False, cast=bool)
+REGISTRATION_REQUIRE_EMAIL_ACTIVATION = config(
+    "REGISTRATION_REQUIRE_EMAIL_ACTIVATION", default=True, cast=bool
+)
+FRONTEND_BASE_URL = config(
+    "FRONTEND_BASE_URL", default="https://front.artemis.init.com.mx"
+)
+
+# CORS — SPA en Vercel (front.artemis.init.com.mx) → API
+_cors_default = "https://front.artemis.init.com.mx,http://localhost:3000,http://127.0.0.1:3000"
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in config("CORS_ALLOWED_ORIGINS", default=_cors_default).split(",")
+    if origin.strip()
+]
+CORS_ALLOW_CREDENTIALS = True
+
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
@@ -117,12 +153,17 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {
+        "register": "10/hour",
+        "password_reset": "5/hour",
+        "activation_resend": "5/hour",
+    },
 }
 
 # drf-spectacular

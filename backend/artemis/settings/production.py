@@ -37,6 +37,26 @@ CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=3600, cast=int)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
+# JWT refresh cookie for cross-subdomain SPA (front.* → API)
+JWT_COOKIE_SAMESITE = config("JWT_COOKIE_SAMESITE", default="None")
+
+# Frontend SPA (Vercel)
+FRONTEND_BASE_URL = config(
+    "FRONTEND_BASE_URL", default="https://front.artemis.init.com.mx"
+)
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in config(
+        "CORS_ALLOWED_ORIGINS",
+        default="https://front.artemis.init.com.mx",
+    ).split(",")
+    if origin.strip()
+]
+CORS_ALLOW_CREDENTIALS = True
+
+# Allow Vercel SPA origin in CSP connect (API calls + fonts already covered)
+CSP_CONNECT_SRC += list(CORS_ALLOWED_ORIGINS)
+
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"

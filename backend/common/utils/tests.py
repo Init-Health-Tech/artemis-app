@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from model_bakery import baker
 from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class TestCaseUtils(TestCase):
@@ -13,7 +14,8 @@ class TestCaseUtils(TestCase):
         self.user.save()
 
         self.auth_client = APIClient()
-        self.auth_client.login(email=self.user.email, password=self._user_password)
+        refresh = RefreshToken.for_user(self.user)
+        self.auth_client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
 
     def reverse(self, name, *args, **kwargs):
         """Reverse a url, convenience to avoid having to import reverse in tests"""
@@ -59,7 +61,7 @@ class TestCaseUtils(TestCase):
 class TestGetRequiresAuthenticatedUser:
     def test_get_requires_authenticated_user(self):
         response = self.client.get(self.view_url)
-        self.assertResponse403(response)
+        self.assertResponse401(response)
 
 
 class TestAuthGetRequestSuccess:

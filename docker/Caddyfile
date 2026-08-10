@@ -1,4 +1,4 @@
-# Proxy HTTP interno — TLS lo termina nginx en el host (ver docker/nginx/artemis.init.com.mx.conf)
+# Proxy HTTP interno — TLS lo termina nginx en el host (ver docker/nginx/api.artemis.init.com.mx.conf)
 :80 {
 	reverse_proxy app:8000
 }

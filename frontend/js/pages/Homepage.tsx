@@ -1,7 +1,5 @@
-import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 
-import { authApi } from '@/js/api/ganado';
 import ArtemisLogo from '@/js/components/ArtemisLogo';
 
 const features = [
@@ -44,14 +42,6 @@ const steps = [
 ];
 
 const Homepage = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    authApi.session().then((res) => {
-      if (res.data.authenticated) navigate('/dashboard', { replace: true });
-    });
-  }, [navigate]);
-
   return (
     <div className="min-h-screen bg-background text-on-surface">
       <header className="sticky top-0 z-50 border-b border-outline-variant/60 bg-background/90 backdrop-blur">

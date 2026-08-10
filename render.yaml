@@ -115,7 +115,15 @@ envVarGroups:
       - key: DJANGO_SETTINGS_MODULE
         value: artemis.settings.production
       - key: ALLOWED_HOSTS
-        value: '*'
+        value: api.artemis.init.com.mx,localhost,127.0.0.1
+      - key: HOST
+        value: https://api.artemis.init.com.mx
+      - key: FRONTEND_BASE_URL
+        value: https://front.artemis.init.com.mx
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://front.artemis.init.com.mx
+      - key: JWT_COOKIE_SAMESITE
+        value: None
   - name: integrations-credentials
     envVars:
       - key: SENDGRID_USERNAME

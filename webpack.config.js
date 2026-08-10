@@ -1,6 +1,8 @@
 const path = require('path');
 
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const webpack = require('webpack');
@@ -8,7 +10,9 @@ const BundleTracker = require('webpack-bundle-tracker');
 
 module.exports = (env, argv) => {
   const isDev = argv.mode === 'development';
+  const isStandalone = process.env.STANDALONE === '1' || process.env.VERCEL === '1';
   const nodeModulesDir = path.resolve(__dirname, 'node_modules');
+
   const localhostOutput = {
     path: path.resolve('./frontend/webpack_bundles/'),
     publicPath: 'http://localhost:3000/frontend/webpack_bundles/',
@@ -20,6 +24,19 @@ module.exports = (env, argv) => {
     filename: '[name]-[chunkhash].js',
     clean: true,
   };
+  const standaloneOutput = {
+    path: path.resolve('./frontend/dist'),
+    publicPath: '/',
+    filename: 'assets/[name]-[contenthash].js',
+    clean: true,
+  };
+
+  let output = productionOutput;
+  if (isStandalone) {
+    output = standaloneOutput;
+  } else if (isDev) {
+    output = localhostOutput;
+  }
 
   return {
     mode: isDev ? 'development' : 'production',
@@ -29,12 +46,20 @@ module.exports = (env, argv) => {
       historyApiFallback: true,
       host: '0.0.0.0',
       port: 3000,
-      // Allow CORS requests from the Django dev server domain:
       headers: { 'Access-Control-Allow-Origin': '*' },
+      proxy: isStandalone
+        ? [
+            {
+              context: ['/api', '/media'],
+              target: process.env.ARTEMIS_API_BASE_URL || 'http://127.0.0.1:8000',
+              changeOrigin: true,
+            },
+          ]
+        : undefined,
     },
     context: __dirname,
     entry: ['./frontend/js/index.tsx'],
-    output: isDev ? localhostOutput : productionOutput,
+    output,
     module: {
       rules: [
         {
@@ -62,7 +87,6 @@ module.exports = (env, argv) => {
             isDev && 'style-loader',
             !isDev && MiniCssExtractPlugin.loader,
             { loader: 'css-loader', options: { importLoaders: 1 } },
-            // Tailwind v4 uses @tailwindcss/postcss (condigured in the postcss.config.mjs file)
             'postcss-loader',
           ].filter(Boolean),
         },
@@ -81,12 +105,60 @@ module.exports = (env, argv) => {
       ],
     },
     plugins: [
-      !isDev && new MiniCssExtractPlugin({ filename: '[name]-[chunkhash].css' }),
-      isDev && new ReactRefreshWebpackPlugin(),
-      new BundleTracker({
-        path: __dirname,
-        filename: 'webpack-stats.json',
+      new webpack.DefinePlugin({
+        'process.env.ARTEMIS_API_BASE_URL': JSON.stringify(
+          process.env.ARTEMIS_API_BASE_URL || '',
+        ),
       }),
+      !isDev &&
+        new MiniCssExtractPlugin({
+          filename: isStandalone ? 'assets/[name]-[contenthash].css' : '[name]-[chunkhash].css',
+        }),
+      isDev && new ReactRefreshWebpackPlugin(),
+      !isStandalone &&
+        new BundleTracker({
+          path: __dirname,
+          filename: 'webpack-stats.json',
+        }),
+      isStandalone &&
+        new HtmlWebpackPlugin({
+          template: path.resolve(__dirname, 'frontend/public/index.html'),
+          filename: 'index.html',
+          inject: 'body',
+        }),
+      isStandalone &&
+        new CopyWebpackPlugin({
+          patterns: [
+            {
+              from: path.resolve(
+                __dirname,
+                'frontend/assets/images/brand/favicon.ico',
+              ),
+              to: path.resolve(__dirname, 'frontend/dist/favicon.ico'),
+            },
+            {
+              from: path.resolve(
+                __dirname,
+                'frontend/assets/images/brand/favicon-16.png',
+              ),
+              to: path.resolve(__dirname, 'frontend/dist/favicon-16.png'),
+            },
+            {
+              from: path.resolve(
+                __dirname,
+                'frontend/assets/images/brand/favicon-32.png',
+              ),
+              to: path.resolve(__dirname, 'frontend/dist/favicon-32.png'),
+            },
+            {
+              from: path.resolve(
+                __dirname,
+                'frontend/assets/images/brand/apple-touch-icon.png',
+              ),
+              to: path.resolve(__dirname, 'frontend/dist/apple-touch-icon.png'),
+            },
+          ],
+        }),
       new NodePolyfillPlugin(),
       new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
     ].filter(Boolean),
@@ -99,7 +171,6 @@ module.exports = (env, argv) => {
     optimization: {
       minimize: !isDev,
       splitChunks: {
-        // include all types of chunks
         chunks: 'all',
       },
     },

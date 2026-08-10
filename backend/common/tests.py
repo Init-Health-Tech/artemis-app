@@ -11,7 +11,17 @@ class TestIndexView(TestCaseUtils):
         self.assertResponse200(response)
 
     def test_spa_routes_serve_index_on_refresh(self):
-        for path in ("/", "/dashboard", "/rfid", "/animales", "/lotes", "/inventario", "/estados", "/login"):
+        for path in (
+            "/",
+            "/dashboard",
+            "/rfid",
+            "/animales",
+            "/lotes",
+            "/inventario",
+            "/estados",
+            "/login",
+            "/recuperar-contrasena",
+        ):
             response = self.auth_client.get(path)
             self.assertEqual(response.status_code, 200, path)
 
@@ -31,7 +41,8 @@ class TestAdminEnvironmentNotice(TestCaseUtils):
         ADMIN_ENVIRONMENT_BACKGROUND_COLOR="#facc15",
     )
     def test_admin_index_shows_configured_environment_notice_styles(self):
-        response = self.auth_client.get(self.reverse(self.view_name))
+        self.client.force_login(self.user)
+        response = self.client.get(self.reverse(self.view_name))
 
         self.assertResponse200(response)
         self.assertContains(response, "Review App")

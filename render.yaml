@@ -119,9 +119,9 @@ envVarGroups:
       - key: HOST
         value: https://api.artemis.init.com.mx
       - key: FRONTEND_BASE_URL
-        value: https://front.artemis.init.com.mx
+        value: https://artemis.init.com.mx
       - key: CORS_ALLOWED_ORIGINS
-        value: https://front.artemis.init.com.mx
+        value: https://artemis.init.com.mx
       - key: JWT_COOKIE_SAMESITE
         value: None
   - name: integrations-credentials

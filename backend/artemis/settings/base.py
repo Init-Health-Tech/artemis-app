@@ -132,11 +132,11 @@ REGISTRATION_REQUIRE_EMAIL_ACTIVATION = config(
     "REGISTRATION_REQUIRE_EMAIL_ACTIVATION", default=True, cast=bool
 )
 FRONTEND_BASE_URL = config(
-    "FRONTEND_BASE_URL", default="https://front.artemis.init.com.mx"
+    "FRONTEND_BASE_URL", default="https://artemis.init.com.mx"
 )
 
-# CORS — SPA en Vercel (front.artemis.init.com.mx) → API
-_cors_default = "https://front.artemis.init.com.mx,http://localhost:3000,http://127.0.0.1:3000"
+# CORS — SPA en Vercel (artemis.init.com.mx) → API
+_cors_default = "https://artemis.init.com.mx,http://localhost:3000,http://127.0.0.1:3000"
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in config("CORS_ALLOWED_ORIGINS", default=_cors_default).split(",")

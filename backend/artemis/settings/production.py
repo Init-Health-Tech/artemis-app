@@ -42,13 +42,13 @@ JWT_COOKIE_SAMESITE = config("JWT_COOKIE_SAMESITE", default="None")
 
 # Frontend SPA (Vercel)
 FRONTEND_BASE_URL = config(
-    "FRONTEND_BASE_URL", default="https://front.artemis.init.com.mx"
+    "FRONTEND_BASE_URL", default="https://artemis.init.com.mx"
 )
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in config(
         "CORS_ALLOWED_ORIGINS",
-        default="https://front.artemis.init.com.mx",
+        default="https://artemis.init.com.mx",
     ).split(",")
     if origin.strip()
 ]

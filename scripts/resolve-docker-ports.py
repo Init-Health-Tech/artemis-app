@@ -65,7 +65,7 @@ ARTEMIS_HTTP_PORT_KEY = ("ARTEMIS_HTTP_PORT", 18080)
 def main() -> None:
     base = parse_env(ENV_OUT) or parse_env(ENV_EXAMPLE)
     domain = base.get("ARTEMIS_DOMAIN", "api.artemis.init.com.mx")
-    frontend = base.get("FRONTEND_BASE_URL", "https://front.artemis.init.com.mx").rstrip("/")
+    frontend = base.get("FRONTEND_BASE_URL", "https://artemis.init.com.mx").rstrip("/")
 
     resolved: dict[str, str] = dict(base)
     http_key, http_default = ARTEMIS_HTTP_PORT_KEY

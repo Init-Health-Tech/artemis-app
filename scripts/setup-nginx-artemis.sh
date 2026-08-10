@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CONF_SRC="${ROOT}/docker/nginx/api.artemis.init.com.mx.conf"
 CONF_DST="/etc/nginx/sites-available/api.artemis.init.com.mx"
 DOMAIN="api.artemis.init.com.mx"
-FRONTEND="front.artemis.init.com.mx"
+FRONTEND="artemis.init.com.mx"
 
 if [[ "$(id -u)" -ne 0 ]]; then
   echo "Ejecuta con sudo: sudo $0"

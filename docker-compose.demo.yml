@@ -1,7 +1,7 @@
 # ArtemisApp — Docker demo productivo
 # Uso recomendado: ./scripts/docker-demo-up.sh
 #
-# Dominio API: api.artemis.init.com.mx | Front (Vercel): front.artemis.init.com.mx
+# Dominio API: api.artemis.init.com.mx | Front (Vercel): artemis.init.com.mx
 # (ver .env.docker)
 # Puertos: se autoasignan si el preferido está ocupado (scripts/resolve-docker-ports.py)
 
@@ -35,11 +35,11 @@ services:
       DATABASE_URL: postgres://artemis:artemis_demo@db:5432/artemis
       SECRET_KEY: ${SECRET_KEY:-demo-secret-cambiar-en-produccion-real}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,api.artemis.init.com.mx,app}
-      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-http://localhost,http://127.0.0.1,https://api.artemis.init.com.mx,https://front.artemis.init.com.mx}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-http://localhost,http://127.0.0.1,https://api.artemis.init.com.mx,https://artemis.init.com.mx}
       HOST: ${ARTEMIS_PUBLIC_URL:-https://api.artemis.init.com.mx}
       ARTEMIS_DOMAIN: ${ARTEMIS_DOMAIN:-api.artemis.init.com.mx}
-      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-https://front.artemis.init.com.mx}
-      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://front.artemis.init.com.mx}
+      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-https://artemis.init.com.mx}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://artemis.init.com.mx}
       JWT_COOKIE_SAMESITE: ${JWT_COOKIE_SAMESITE:-None}
       DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-demo@artemis.local}
       DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-demo123}
